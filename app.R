@@ -74,7 +74,7 @@ ui <- fluidPage(
             uiOutput("clip")
             ))),
             HTML(paste("<p>Made by <a href='https://twitter.com/ewen_'>@ewen_</a>.",
-                       "Peep the <a href='https://github.com/ewenme/tracklister'>code</a>.</p>"))
+                       "Peep the <a href='https://github.com/ewenme/traklister'>code</a>.</p>"))
             ),
         column(
             9,
@@ -129,9 +129,9 @@ server <- function(input, output) {
             paste(format(Sys.Date(), "%d%m%y"), ".txt", sep = "")
         },
         content = function(file) {
-            write.table(track_df(), file, 
-                        quote = FALSE, sep = " ", na = " ", 
-                        row.names = FALSE, col.names = FALSE)
+            fileConn <- file(file)
+            writeLines(track_text(), fileConn)
+            close(fileConn)
         }
     )
     

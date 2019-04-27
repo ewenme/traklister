@@ -51,7 +51,7 @@ ui <- fluidPage(
             3,
             # title
             h2("traklister"),
-            HTML(paste("<p>Convert <a href='https://www.native-instruments.com/en/products/traktor/'>Traktor</a> .nml playlists",
+            HTML(paste("<p>Convert <a href='https://en.wikipedia.org/wiki/Traktor'>Traktor</a> .nml playlists",
                        "into a plain-text format.</p>")),
             # file upload
             fileInput("uploadData", NULL,

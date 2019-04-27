@@ -29,6 +29,12 @@ read_traktor_history <- function(file) {
     # replace missing vals w blanks
     attrs[is.na(attrs)] <- " "
     
+    # bracket label
+    attrs$label <- paste0("[", attrs$label, "]")
+    
+    # create artist / title combo
+    attrs$artist_title = paste(attrs$artist, "-", attrs$title)
+    
     return(attrs)
     
 }
@@ -44,16 +50,20 @@ ui <- fluidPage(
         column(
             3,
             # title
-            h2("traks"),
+            h2("traklister"),
             HTML(paste("<p>Convert <a href='https://www.native-instruments.com/en/products/traktor/'>Traktor</a> .nml playlists",
                        "into a plain-text format.</p>")),
             # file upload
             fileInput("uploadData", NULL,
                       accept = c(".nml"), buttonLabel = "browse",
                       placeholder = "no file selected", multiple = FALSE),
+            conditionalPanel(condition = "output.config_cond == false",
             p("Tweak the formatting."),
-            checkboxInput("trackNo", label = "Track #", value = FALSE),
-            p("Export or copy the tracklist."),
+            checkboxGroupInput("trackFields", label = NULL, inline = TRUE,
+                               choiceNames = list("track #", "artist / title", "label"), 
+                               choiceValues = list("track_no", "artist_title", "label"),
+                               selected = list("track_no", "artist_title", "label")),
+            p("Export the tracklist as .txt, or copy it to your clipboard."),
             fluidRow(
                 column(2, 
             # d/l button
@@ -62,7 +72,7 @@ ui <- fluidPage(
             column(2, 
             # UI ouputs for the copy-to-clipboard buttons
             uiOutput("clip")
-            )),
+            ))),
             HTML(paste("<p>Made by <a href='https://twitter.com/ewen_'>@ewen_</a>.",
                        "Peep the <a href='https://github.com/ewenme/tracklister'>code</a>.</p>"))
             ),
@@ -90,15 +100,11 @@ server <- function(input, output) {
     # convert df to text format
     track_text <- reactive({
         
+        req(input$uploadData, input$trackFields)
+        
         df <- track_df()
         
-        if (input$trackNo) {
-            
-            paste0(df$track_no, " ", df$artist, " - ", df$title, " [", df$label, "]", collapse = "\n")
-            
-        } else {
-            paste0(df$artist, " - ", df$title, " [", df$label, "]", collapse = "\n")
-        }
+        do.call(paste, c(df[input$trackFields], collapse = "\n"))
         
     })
 
@@ -110,6 +116,12 @@ server <- function(input, output) {
         track_text()
         
     })
+    
+    # condition to use in the config conditional UI
+    output$config_cond <- reactive({
+        is.null(input$uploadData)
+    })
+    outputOptions(output, "config_cond", suspendWhenHidden = FALSE)
     
     # downloadable .txt of tracklist
     output$downloadData <- downloadHandler(
@@ -123,7 +135,7 @@ server <- function(input, output) {
         }
     )
     
-    # Add clipboard buttons
+    # add clipboard buttons
     output$clip <- renderUI({
         rclipButton("copyData", label = NULL, track_text(), icon("clipboard"))
     })
@@ -132,5 +144,4 @@ server <- function(input, output) {
     observeEvent(input$copyData, write_clip(track_text()))
 }
 
-# Run the application 
 shinyApp(ui = ui, server = server)

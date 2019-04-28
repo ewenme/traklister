@@ -1,0 +1,21 @@
+Package: traklister
+Title: Parse Traktor Playlist Files
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Ewen",
+           family = "Henderson",
+           role = c("aut", "cre"),
+           email = "ewen.henderson@gmail.com",
+           comment = c(ORCID = "0000-0002-4748-4693"))
+Description: Parse Traktor playlist (.nml) files into plain text formats.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Depends:
+    R (>= 3.3.0)
+Imports: 
+    shiny,
+    xml2,
+    clipr,
+    rclipboard
+RoxygenNote: 6.1.1

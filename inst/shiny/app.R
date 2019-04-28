@@ -58,7 +58,7 @@ server <- function(input, output) {
         if (is.null(upload)) return(NULL)
         
         # filenames object
-        parse_traktor_nml(file = upload$name)
+        parse_traktor_nml(file = upload$datapath)
 
     })
     

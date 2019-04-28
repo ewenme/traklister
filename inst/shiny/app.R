@@ -105,8 +105,6 @@ server <- function(input, output) {
         rclipButton("copyData", label = NULL, track_text(), icon("clipboard"))
     })
     
-    # Workaround for execution within RStudio
-    observeEvent(input$copyData, write_clip(track_text()))
 }
 
 shinyApp(ui = ui, server = server)

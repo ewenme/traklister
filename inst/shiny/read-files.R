@@ -1,6 +1,4 @@
-#' Parse a Traktor .nml file
-#' @param file path to a .nml file
-#' @export
+# parse a Traktor .nml file
 parse_traktor_nml <- function(file) {
   
   # read file

@@ -3,9 +3,10 @@ library(shiny)
 library(clipr)
 library(rclipboard)
 library(xml2)
-library(traklister)
 
-ui <- fluidPage(
+source("read-files.R")
+
+ui <- fluidPage(title = "traklister",
     
     includeCSS("www/styles.css"),
     

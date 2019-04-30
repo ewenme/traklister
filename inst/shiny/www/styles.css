@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Work+Sans');
+@import url('https://fonts.googleapis.com/css?family=Work+Sans:400,700');
 
 div {
   font-family: Work Sans, sans-serif;
@@ -6,4 +6,8 @@ div {
 
 .row {
   margin-bottom: 10px;
+}
+
+h2 {
+  font-weight: 700;
 }

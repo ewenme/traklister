@@ -4,31 +4,63 @@ parse_traktor_nml <- function(file) {
   # read file
   traktor_history <- read_xml(x = file)
   
-  # parse xml tree
-  entries <- xml_find_all(xml_child(traktor_history, search = 3), xpath = ".//ENTRY")
+  # parse collection entries
+  collection_entries <- xml_find_all(xml_child(traktor_history, search = "COLLECTION"), xpath = ".//ENTRY")
+
+  # parse entries info
+  collection_entries_info <- xml_find_first(collection_entries, xpath = ".//INFO")
   
-  info <- xml_find_first(entries, xpath = ".//INFO")
+  # parse locations
+  collection_locations <- xml_find_all(collection_entries, xpath = ".//LOCATION")
   
-  # extract key attrs
-  attrs <- data.frame(
-    track_no = sprintf("%02d.", seq_along(entries)),
-    artist = xml_attr(entries, "ARTIST"),
-    title = xml_attr(entries, "TITLE"),
-    label = xml_attr(info, "LABEL")
+  collection_locations <- paste0(xml_attr(collection_locations, "VOLUME"), 
+                                 xml_attr(collection_locations, "DIR"),
+                                 xml_attr(collection_locations, "FILE"))
+  
+  # parse playlist entries
+  playlist_entries <- xml_find_all(xml_child(traktor_history, search = "PLAYLISTS"), 
+                                   xpath = ".//ENTRY")
+  
+  # isolate playlist keys
+  playlist_keys <- xml_attr(xml_child(playlist_entries, search = "PRIMARYKEY"), attr = "KEY")
+  
+  # collection data frame
+  collection_df <- data.frame(
+    artist = xml_attr(collection_entries, "ARTIST"),
+    title = xml_attr(collection_entries, "TITLE"),
+    label = xml_attr(collection_entries_info, "LABEL"),
+    location = collection_locations
   )
   
+  # playlist data frame
+  playlist_df <- data.frame(
+    track_no_num = seq_along(playlist_keys),
+    track_no = sprintf("%02d.", seq_along(playlist_keys)),
+    location = playlist_keys
+  )
+  
+  # join df
+  df <- merge(playlist_df, collection_df, by = "location", sort = FALSE)
+  
+  # sort by track no
+  df <- df[order(df$track_no_num),]
+  
+  # rm unused cols
+  df$location <- NULL
+  df$track_no_num <- NULL
+  
   # rm whitespace
-  attrs <- as.data.frame(lapply(attrs, trimws), stringsAsFactors = FALSE)
+  df <- as.data.frame(lapply(df, trimws), stringsAsFactors = FALSE)
   
   # replace missing vals w blanks
-  attrs[is.na(attrs)] <- " "
+  df[is.na(df)] <- " "
   
   # bracket label
-  attrs$label <- paste0("[", attrs$label, "]")
+  df$label <- paste0("[", df$label, "]")
   
   # create artist / title combo
-  attrs$artist_title = paste(attrs$artist, "-", attrs$title)
+  df$artist_title = paste(df$artist, "-", df$title)
   
-  return(attrs)
+  return(df)
   
 }

@@ -1,6 +1,8 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+Superceded by [tracklister](https://github.com/ewenme/tracklister).
+
 # traklister
 
 ![traklister](traklister-demo.gif)
